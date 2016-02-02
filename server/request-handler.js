@@ -36,19 +36,19 @@ var requestHandler = function(request, response) {
   
   if(request.method === 'GET'){
     var statusCode = 200;
-  }
+    } 
   else {
     var statusCode = 201;
     request.on('data', function(data) {
-      console.log(JSON.parse(data));
       data = JSON.parse(data);
-      var message = {'username': data.username, 'message':data.message};
-      console.log(message);
+      var message = {'username': data.username, 'message':data.message, 'roomname':data.roomname};
       postedData.results.push(message);
     });
     
   }
-  
+  if(request.url !== '/classes/chatterbox'){
+    statusCode = 404;
+  }
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
@@ -91,4 +91,4 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
-exports.requestHandler = requestHandler
+exports.requestHandler = requestHandler;
