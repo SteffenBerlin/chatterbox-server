@@ -29,6 +29,7 @@ describe('Node Server Request Listener Function', function() {
 
     handler.requestHandler(req, res);
 
+    //console.log("---------------------------------------------", res._data);
     expect(JSON.parse.bind(this, res._data)).to.not.throw();
     expect(res._ended).to.equal(true);
   });
@@ -82,7 +83,7 @@ it('Should respond with messages that were previously posted', function() {
     };
     var req = new stubs.request('/classes/room1', 'POST', stubMsg);
     var res = new stubs.response();
-
+    console.log("########################", req);
     handler.requestHandler(req, res);
 
     expect(res._responseCode).to.equal(201);
