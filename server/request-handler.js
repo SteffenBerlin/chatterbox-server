@@ -11,8 +11,9 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+console.log("we're inside the file");
+var postedData = {'results': []};
 
-var postedData = {'results': [ ]};
 
 var querystring = require('querystring');
 var requestHandler = function(request, response) {
@@ -24,7 +25,7 @@ var requestHandler = function(request, response) {
   //
   // Documentation for both request and response can be found in the HTTP section at
   // http://nodejs.org/documentation/api/
-
+  console.log("this is the url/////////////////",request.url);
   // Do some basic logging.
   //
   // Adding more logging to your server can be an easy way to get passive
@@ -33,35 +34,52 @@ var requestHandler = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
 
   // The outgoing status.
-  
-  if(request.method === 'GET'){
+ 
+  var headers = defaultCorsHeaders;
+  headers['Content-Type'] = "text/plain";
+
+   
+  if(request.method === 'GET' || request.method === 'OPTIONS'){
     var statusCode = 200;
-    } 
-  else {
+    response.writeHead(statusCode, headers);
+    console.log("this is the get string", JSON.stringify(postedData));
+    response.end(JSON.stringify(postedData));
+  } else {
+    var accData = "";
     var statusCode = 201;
+    response.writeHead(statusCode, headers);
     request.on('data', function(data) {
-      data = JSON.parse(data);
-      var message = {'username': data.username, 'message':data.message, 'roomname':data.roomname};
-      postedData.results.push(message);
+      accData += data;
+      console.log("accData", accData);
+
+    });
+
+    request.on('end', function(){
+      var parsedData = JSON.parse(accData);
+      console.log('this is the parsed data', parsedData);
+      postedData.results.push(parsedData);
+      console.log(postedData);
+      response.end(JSON.stringify(parsedData));
+
     });
     
   }
-  if(request.url !== '/classes/chatterbox'){
+  //console.log(request.url.slice(0,19));
+  if(request.url.slice(0,19) !== '/classes/chatterbox'){
     statusCode = 404;
   }
   // See the note below about CORS headers.
-  var headers = defaultCorsHeaders;
+
 
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = "text/plain";
+  
   // console.dir("request: ", request);
   // console.dir("response: ", response);
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
   //response.write({a:"a"});
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -71,7 +89,6 @@ var requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   // response.end(JSON.stringify("yiha"));
-  response.end(JSON.stringify(postedData));
 
   //response.end("Hello, World!");
 };
