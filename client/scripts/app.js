@@ -37,14 +37,16 @@ var app = {
     app.startSpinner();
     // Clear messages input
     app.$message.val('');
-
-    // POST the message to the server
+    console.log("Posting from app.send");
+    console.log("Data being posted: " + JSON.stringify(data));
+        // POST the message to the server
     $.ajax({
       url: app.server,
       type: 'POST',
       data: JSON.stringify(data),
       contentType: 'application/json',
       success: function (data) {
+        data = JSON.parse(data);
         // Trigger a fetch to update the messages, pass true to animate
         app.fetch();
       },
@@ -61,6 +63,9 @@ var app = {
       contentType: 'application/json',
       data: { order: '-createdAt'},
       success: function(data) {
+        data = JSON.parse(data);
+        //console.log("works");
+        // debugger;
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) { return; }
 
@@ -212,6 +217,7 @@ var app = {
   },
 
   handleSubmit: function(evt) {
+    console.log("handleSubmit")
     var message = {
       username: app.username,
       text: app.$message.val(),
